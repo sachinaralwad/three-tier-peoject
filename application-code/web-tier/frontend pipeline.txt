@@ -1,0 +1,27 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/sachinaralwad/three-tier-peoject.git'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    docker.build('frontend')
+                }
+            }
+        }
+
+        stage('Deploy and Run') {
+            steps {
+                script {
+                    docker.image('frontend').run('-it')
+                }
+            }
+        }
+    }
+}
