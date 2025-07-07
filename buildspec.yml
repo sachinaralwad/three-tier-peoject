@@ -6,7 +6,7 @@ phases:
       nodejs: 18
     commands:
       - echo Building the Docker image...
-      - docker build -t https://github.com/sachinaralwad/three-tier-peoject.git:latest .
+      - docker build -t $REPOSITORY_NAME:$IMAGE_TAG 
       
   build:
     commands:
