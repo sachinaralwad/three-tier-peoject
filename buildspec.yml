@@ -1,0 +1,23 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18
+    commands:
+      - echo Building the Docker image...
+      - docker build -t https://github.com/sachinaralwad/three-tier-peoject.git:latest .
+      
+  build:
+    commands:
+      - echo Building frontend...
+      - cd ../../application-code/web-tier
+      - npm run build
+      - echo Build complete.
+
+artifacts:
+  files:
+    - appspec.yml
+    - scripts/*
+    - application-code/web-tier/build//*
+    
