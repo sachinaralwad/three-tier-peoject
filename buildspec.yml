@@ -17,6 +17,7 @@ phases:
       - npm run build
       - cd ../../
       - echo Building Docker image...
+      - cd ../../application-code/web-tier/Dockerfile
       - docker build -t my-three-tier-app:latest .
   
 artifacts:
