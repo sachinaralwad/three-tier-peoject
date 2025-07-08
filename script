@@ -1,11 +1,95 @@
 #!/bin/bash
-echo "Stopping the existing application..."
 
-# Stop the Docker container if it's running
-docker stop my-three-tier-app || true
+# Exit on first error
+set -e
 
-# Remove the stopped container (optional)
-docker rm my-three-tier-app || true
+# Define the application name and Docker image
+APP_NAME="my-three-tier-app"
+DOCKER_IMAGE="$APP_NAME:latest"
+TARGET_DIR="/var/www/my-app"
 
-# Optionally remove any dangling images if you want to keep the environment clean
-docker rmi $(docker images -f "dangling=true" -q) || true
+# Function to stop any running instance of the app
+stop_server() {
+  echo "Stopping the existing application..."
+
+  # Stop and remove the Docker container if it exists
+  docker stop $APP_NAME || true
+  docker rm $APP_NAME || true
+
+  # Optionally remove dangling Docker images
+  docker rmi $(docker images -f "dangling=true" -q) || true
+}
+
+# Function to install and build the application
+install_app() {
+  echo "Installing frontend dependencies..."
+  # Navigate to the web-tier folder and install dependencies
+  cd application-code/web-tier
+  npm install
+
+  echo "Building frontend..."
+  npm run build
+
+  # Go back to the root directory
+  cd ../../
+
+  # Optionally, copy any other files if needed (can be done via appspec.yml)
+}
+
+# Function to start the Docker container
+start_server() {
+  echo "Starting the application..."
+  
+  # Build the Docker image if needed (you can skip this if already built)
+  docker build -t $DOCKER_IMAGE ./application-code/web-tier
+
+  # Run the Docker container
+  docker run -d --name $APP_NAME -p 80:80 $DOCKER_IMAGE
+
+  # Check if the container started correctly
+  if [ $? -eq 0 ]; then
+    echo "Application started successfully!"
+  else
+    echo "Failed to start the application!" >&2
+    exit 1
+  fi
+}
+
+# Function to run post-deployment tasks
+post_deploy() {
+  echo "Running post-deployment setup..."
+  
+  # Example: Check if the frontend is accessible (can replace with other commands)
+  curl -f http://localhost || echo "Service is not responding yet!" >&2
+}
+
+# Function to validate the service after deployment
+validate_service() {
+  echo "Validating the service..."
+  
+  # Check if the service is running properly (using curl or another method)
+  curl -f http://localhost || exit 1
+
+  echo "Service is running correctly!"
+}
+
+# Main Deployment Flow
+
+echo "Starting deployment..."
+
+# Stop the old server (if any)
+stop_server
+
+# Install and build the application
+install_app
+
+# Start the new server (Docker container)
+start_server
+
+# Run post-deployment tasks (e.g., migrations, additional configurations)
+post_deploy
+
+# Validate if the service is running correctly
+validate_service
+
+echo "Deployment completed successfully!"
