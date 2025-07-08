@@ -1,0 +1,36 @@
+version: 0.0
+os: linux
+files:
+  # Copy the built frontend files to the target directory on the instance
+  - source: /web-tier/build
+    destination: /var/www/my-app/web-tier
+
+  # Copy scripts (like deployment or setup scripts) to the target instance
+  - source: scripts/*
+    destination: /var/www/my-app/scripts
+
+  # Copy the appspec.yml to the target directory (optional)
+  - source: appspec.yml
+    destination: /var/www/my-app/
+
+hooks:
+  BeforeInstall:
+    - location: scripts/stop-server.sh
+      timeout: 180
+      runas: root
+  Install:
+    - location: scripts/start-server.sh
+      timeout: 180
+      runas: root
+  AfterInstall:
+    - location: scripts/post-deploy.sh
+      timeout: 180
+      runas: root
+  ApplicationStart:
+    - location: scripts/start-frontend.sh
+      timeout: 180
+      runas: root
+  ValidateService:
+    - location: scripts/validate-service.sh
+      timeout: 180
+      runas: root
