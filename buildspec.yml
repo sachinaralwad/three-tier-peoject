@@ -23,6 +23,7 @@ artifacts:
   files:
     - appspec.yml
     - scripts/*
+    - application-code/web-tier/build/*
     
 
     
