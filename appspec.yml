@@ -3,9 +3,7 @@ os: linux
 
 hooks:
   BeforeInstall:
-    - location: scripts/stop-server.sh
-      timeout: 180
-      runas: root
+  
   Install:
     - location: scripts/start-server.sh
       timeout: 180
