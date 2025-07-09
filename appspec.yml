@@ -1,17 +1,5 @@
 version: 0.0
 os: linux
-files:
-  # Copy the built frontend files to the target directory on the instance
-  - source: /web-tier/build
-    destination: /var/www/my-app/web-tier
-
-  # Copy scripts (like deployment or setup scripts) to the target instance
-  - source: scripts/*
-    destination: /var/www/my-app/scripts
-
-  # Copy the appspec.yml to the target directory (optional)
-  - source: appspec.yml
-    destination: /var/www/my-app/
 
 hooks:
   BeforeInstall:
